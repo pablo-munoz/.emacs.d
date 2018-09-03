@@ -253,6 +253,19 @@
     ("s" magit-status))
   )
 
+(use-package git-gutter
+  :ensure t
+  :defer 0.3
+  :diminish
+  :init (global-git-gutter-mode +1)
+  )
+
+(use-package git-timemachine
+  :ensure t
+  :defer 1
+  :diminish
+  )
+
 ;; ======================================================================
 ;; Themes
 ;; ======================================================================
@@ -426,7 +439,7 @@ _f_: Calm For     _b_: Sanity Blue
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
+    (git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#657b83" 0.2))
