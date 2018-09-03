@@ -307,7 +307,8 @@
   :ensure t
   :after ivy
   :bind (("C-s" . swiper)
-         ("C-r" . swiper)))
+         ("C-r" . swiper))
+  )
 
 (use-package docker-tramp
   :ensure t
@@ -333,6 +334,15 @@
 			     (split-string dockernames-raw "\n"))))
 	  (setq ad-return-value dockernames))
       ad-do-it))
+  )
+
+(use-package ledger-mode
+  :ensure t
+  :mode ("\\.dat\\'"
+	 "\\.ledger\\'")
+  :custom (ledger-clear-whole-transactions t)
+  :config
+  (add-hook 'ledger-mode-hook #'ledger-flymake-enable)
   )
 
 ;; ======================================================================
@@ -510,7 +520,7 @@ _f_: Calm For     _b_: Sanity Blue
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
+    (ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#657b83" 0.2))
