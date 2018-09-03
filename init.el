@@ -309,6 +309,32 @@
   :bind (("C-s" . swiper)
          ("C-r" . swiper)))
 
+(use-package docker-tramp
+  :ensure t
+  :config
+  ;; Open files in Docker containers like so: /docker:drunk_bardeen:/etc/passwd
+  (push
+   (cons
+    "docker"
+    '((tramp-login-program "docker")
+      (tramp-login-args (("exec" "-it") ("%h") ("/bin/bash")))
+      (tramp-remote-shell "/bin/sh")
+      (tramp-remote-shell-args ("-i") ("-c"))))
+   tramp-methods)
+
+  (defadvice tramp-completion-handle-file-name-all-completions
+      (around dotemacs-completion-docker activate)
+    "(tramp-completion-handle-file-name-all-completions \"\" \"/docker:\" returns
+    a list of active Docker container names, followed by colons."
+    (if (equal (ad-get-arg 1) "/docker:")
+	(let* ((dockernames-raw (shell-command-to-string "docker ps | perl -we 'use strict; $_ = <>; m/^(.*)NAMES/ or die; my $offset = length($1); while(<>) {substr($_, 0, $offset, q()); chomp; for(split m/\\W+/) {print qq($_:\n)} }'"))
+	       (dockernames (cl-remove-if-not
+			     #'(lambda (dockerline) (string-match ":$" dockerline))
+			     (split-string dockernames-raw "\n"))))
+	  (setq ad-return-value dockernames))
+      ad-do-it))
+  )
+
 ;; ======================================================================
 ;; Themes
 ;; ======================================================================
@@ -475,6 +501,8 @@ _f_: Calm For     _b_: Sanity Blue
     ("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3")))
  '(hl-paren-colors (quote ("#2aa198" "#b58900" "#268bd2" "#6c71c4" "#859900")))
  '(hl-sexp-background-color "#efebe9")
+ '(ivy-count-format "(%d/%d) ")
+ '(ivy-use-virtual-buffers t)
  '(linum-format (quote dynamic))
  '(magit-diff-use-overlays nil)
  '(nrepl-message-colors
@@ -482,7 +510,7 @@ _f_: Calm For     _b_: Sanity Blue
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
+    (docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#657b83" 0.2))
