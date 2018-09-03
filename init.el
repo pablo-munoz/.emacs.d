@@ -203,6 +203,14 @@
   ;; Fixing another key binding bug in iedit mode
   (define-key global-map (kbd "C-c o") 'iedit-mode)
   (setenv "PYTHONPATH" "/usr/bin/python")
+  (defun python-shell-completion-native-try ()
+    (with-eval-after-load 'python
+      '(let ((python-shell-completion-native-enable t)
+	     (python-shell-completion-native-output-timeout
+	      python-shell-completion-native-try-output-timeout))
+	 (python-shell-completion-native-get-completions
+	  (get-buffer-process (current-buffer))
+			      nil "_"))))
   )
 
 (use-package flymake-cursor
@@ -344,6 +352,32 @@
   :config
   (add-hook 'ledger-mode-hook #'ledger-flymake-enable)
   )
+
+(use-package pyenv-mode
+  :ensure t
+  :config
+  (setenv "WORKON_HOME" "~/my/virtualenvs")
+  )
+
+(use-package exec-path-from-shell
+  :ensure t
+  :when (eq system-type 'darwin)
+  :config 
+  (exec-path-from-shell-initialize)
+  )
+
+(use-package flycheck
+  :ensure t
+  :config
+  (global-flycheck-mode)
+  )
+
+(use-package ibuffer
+  :ensure t
+  :config
+  )
+
+;; Next package
 
 ;; ======================================================================
 ;; Themes
@@ -513,6 +547,7 @@ _f_: Calm For     _b_: Sanity Blue
  '(hl-sexp-background-color "#efebe9")
  '(ivy-count-format "(%d/%d) ")
  '(ivy-use-virtual-buffers t)
+ '(ledger-clear-whole-transactions t t)
  '(linum-format (quote dynamic))
  '(magit-diff-use-overlays nil)
  '(nrepl-message-colors
@@ -520,7 +555,7 @@ _f_: Calm For     _b_: Sanity Blue
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
+    (flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#657b83" 0.2))
