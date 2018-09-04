@@ -1,3 +1,4 @@
+;;; Commentary:
 ;; Pablo Munoz's init.el
 
 ;; Install use-package, which is going to be used to install
@@ -7,6 +8,7 @@
 ;; Quality of life
 ;; ======================================================================
 
+;;; Code:
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (tool-bar-mode -1)
@@ -100,7 +102,6 @@
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (setq evil-shift-round nil)
-  (setq evil-want-C-u-scroll t)
   :config    ;; tweak evil AFTER loading
   (evil-mode)
 
@@ -123,6 +124,27 @@
   (progn
     ;; The GTD part of this config is heavily inspired by
     ;; https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
+    (setq org-ditaa-jar-path "~/Dropbox/org-mode/contrib/scripts/ditaa.jar")
+    (setq org-plantuml-jar-path "~/java/plantuml.jar")
+    (add-hook 'org-babel-after-execute-hook 'bh/display-inline-images 'append)
+
+    (org-babel-do-load-languages
+     (quote org-babel-load-languages)
+     (quote ((emacs-lisp . t)
+	     (dot . t)
+	     (ditaa . t)
+	     (R . t)
+	     (python . t)
+	     (ruby . t)
+	     (gnuplot . t)
+	     (clojure . t)
+	     (shell . t)
+	     (ledger . t)
+	     (org . t)
+	     (plantuml . t)
+	     (latex . t))))
+
+    (setq org-startup-indented t)
     (setq org-directory "~/my/org")
     (setq org-agenda-files
           (mapcar (lambda (path) (concat org-directory path))
@@ -188,6 +210,12 @@
 (use-package org-jira
   :ensure t
   :defer t
+  :init
+  (defvar org-jira-working-dir "~/my/work/skycatch/jira"
+    "Folder under which to store org-jira working files.")
+  (defconst org-jira-progress-issue-flow
+    '(("To Do" . "In Progress")
+      ("In Progress" . "Done")))
   :config
   (setq jiralib-token
 	`("cookie" . "ajs_group_id=null; ajs_anonymous_id=%226b7dc79c-19a6-46a1-b042-9ee2011252a6%22; share_onboarding_seen=1; _csrf=8ALgWm4cHpPIEAurDLRbR3mb; atlassian.xsrf.token=BK6Q-G0KC-9DDN-GXU0_aff8083395d22f5cce535185b4a386fa14ccab52_lin; jira.mobile.native.experience.prompt=true; cloud.session.token=eyJraWQiOiJzZXNzaW9uLXNlcnZpY2VcL3Nlc3Npb24tc2VydmljZSIsImFsZyI6IlJTMjU2In0.eyJhc3NvY2lhdGlvbnMiOltdLCJzdWIiOiI1NTcwNTg6NGU3ZDBjYzItNmJmYi00MTg4LTk1OTItOTM4Yzk5NjY5MGU3IiwiYXVkIjoiYXRsYXNzaWFuIiwiaW1wZXJzb25hdGlvbiI6W10sIm5iZiI6MTUzNTk0Mzk0NiwicmVmcmVzaFRpbWVvdXQiOjE1MzU5NDQ1NDYsImlzcyI6InNlc3Npb24tc2VydmljZSIsInNlc3Npb25JZCI6IjY1ZmQ1NzI2LTUyNGItNDE2Ny05NGVmLWY5ZTk2ODdjYzA0YiIsImV4cCI6MTUzODUzNTk0NiwiaWF0IjoxNTM1OTQzOTQ2LCJlbWFpbCI6InBtdW5vekBza3ljYXRjaC5jb20iLCJqdGkiOiI2NWZkNTcyNi01MjRiLTQxNjctOTRlZi1mOWU5Njg3Y2MwNGIifQ.NIqiHOQBvixnBOIkV7qQHmSUEWlGb-WG9SQbUMJU3NSjFxVlrICmsZwVSz7XHbbGshFQPKE2RZ6WMereE7GgqsKUpQPB9AftQvS9trf49xyCOGkSdtWvcLbOsoSIMr6oYFSswiq_Aclg47jC4hFEdZuQgpB1oLNQ13OabhepW8DH7QhQEp2qrPtMWrjP_0fQXK5J227CujUNdKcHte7gTAxZIyRT3W2vvI6bcRHxvFgaBg0ORTc0VR4TxEQbaakUeixkFohTG9oYS824XA-g5NPPUr25QaeVI5bahQbILDr5_gSs9a4NjOqOOAGPhQ8cBg4yCX_i-_t-1Wzf1R5S2A"))
@@ -368,6 +396,8 @@
 
 (use-package flycheck
   :ensure t
+  :custom
+  (flycheck-global-modes '(not org-mode))
   :config
   (global-flycheck-mode)
   )
@@ -375,6 +405,24 @@
 (use-package ibuffer
   :ensure t
   :config
+  )
+
+(use-package powerline
+  :ensure t
+  :config
+  (powerline-default-theme)
+  )
+
+(use-package dockerfile-mode
+  :ensure t
+  )
+
+(use-package cmake-mode
+  :ensure t
+  )
+
+(use-package try
+  :ensure t
   )
 
 ;; Next package
@@ -473,13 +521,24 @@
   :defer t
   )
 
+(use-package gotham
+  :ensure gotham
+  :defer t
+  )
+
+(use-package cyberpunk
+  :ensure cyberpunk-theme
+  :defer t
+  )
+
 (defhydra pm/themes-hydra (:hint nil :color pink)
   "
 Themes
 ----------------------------------------------------
-_s_: Sol Dark     _m_: Mat Dark      _x_: toxi    _DEL_: none
-_S_: Sol Light    _M_: Mat Light     _c_: cherry
-_f_: Calm For     _b_: Sanity Blue
+_s_: Sol Dark     _m_: Mat Dark      _x_: Toxi    _DEL_: none
+_S_: Sol Light    _M_: Mat Light     _c_: Cherry
+_f_: Calm For     _b_: Sanity Blue   _k_: Cpunk
+_g_: Gotham
 "
   ("s" (load-theme 'solarized-dark  t))
   ("S" (load-theme 'solarized-light t))
@@ -489,6 +548,8 @@ _f_: Calm For     _b_: Sanity Blue
   ("c" (load-theme 'cherry-blossom  t))
   ("f" (load-theme 'calmer-forest   t))
   ("b" (load-theme 'sanityinc-tomorrow-blue))
+  ("g" (load-theme 'gotham t))
+  ("k" (load-theme 'cyberpunk-theme t))
   ("DEL" (pm/disable-all-themes))
   ("RET" nil "done" :color blue)
   )
@@ -518,6 +579,7 @@ _f_: Calm For     _b_: Sanity Blue
     ("82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "04589c18c2087cd6f12c01807eed0bdaa63983787025c209b89c779c61c3a4c4" "8a97050c9dd0af1cd8c3290b061f4b6032ccf2044ddc4d3c2c39e516239b2463" default)))
  '(fci-rule-color "#ECEFF1")
  '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
+ '(flycheck-global-modes (quote (not org-mode)))
  '(frame-background-mode (quote dark))
  '(fringe-mode 6 nil (fringe))
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
@@ -555,7 +617,7 @@ _f_: Calm For     _b_: Sanity Blue
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
+    (try gotham cyberpunk-theme gotham-theme powerline flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#657b83" 0.2))
