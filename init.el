@@ -1,14 +1,11 @@
+;;; init.el --- My emacs config
 ;;; Commentary:
-;; Pablo Munoz's init.el
-
 ;; Install use-package, which is going to be used to install
 ;; other packages in an easy manner.
 
 ;; ======================================================================
 ;; Quality of life
 ;; ======================================================================
-
-;;; Code:
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (tool-bar-mode -1)
@@ -94,21 +91,6 @@
   
   (require 'use-package))
 
-;; evil: Emulation of Vim in emacs
-(use-package evil
-  :ensure t ;; install evil package if not installed
-  :init      ;; tweak evil's configuration BEFORE loading
-  (setq evil-ex-complete-emacs-commands nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
-  (setq evil-shift-round nil)
-  :config    ;; tweak evil AFTER loading
-  (evil-mode)
-
-  ;; example how to map a command in normal mode (called 'normal state' in evil)
-  (define-key evil-normal-state-map (kbd ", w") 'evil-window-vsplit)
-  )
-
 ;; org-mode: An awesome package for organization/notes
 (use-package org
   :ensure t
@@ -127,6 +109,7 @@
     (setq org-ditaa-jar-path "~/Dropbox/org-mode/contrib/scripts/ditaa.jar")
     (setq org-plantuml-jar-path "~/java/plantuml.jar")
     (add-hook 'org-babel-after-execute-hook 'bh/display-inline-images 'append)
+    (remove-hook 'org-babel-after-execute-hook 'bh/display-inline-images)
 
     (org-babel-do-load-languages
      (quote org-babel-load-languages)
@@ -153,10 +136,9 @@
                     "/gtd/inbox.org"
                     "/gtd/tickler.org")))
     (setq org-log-done 'time)
-    (setq org-src-fontify-natively t)
-    (setq org-src-preserve-indentation t)
-    (setq org-src-tab-acts-natively t)
-    (setq org-use-speed-commands t)
+    (setq org-src-fontify-natively t
+	  org-src-preserve-indentation t
+	  org-src-tab-acts-natively t)
     (setq org-capture-templates
           '(("t" "Todo [inbox]" entry
              (file+headline "~/org/gtd/inbox.org" "Tasks")
@@ -191,6 +173,19 @@
   :ensure t
   :commands (org-bullets-mode)
   :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  )
+
+;; evil: Emulation of Vim in emacs
+(use-package evil
+  :ensure t ;; install evil package if not installed
+  :init      ;; tweak evil's configuration BEFORE loading
+  :config    ;; tweak evil AFTER loading
+  (evil-mode)
+
+  ;; example how to map a command in normal mode (called 'normal state' in evil)
+  (define-key evil-normal-state-map (kbd ", w") 'evil-window-vsplit)
+  (evil-define-key 'normal org-mode-map "<tab>" 'org-cycle)
+  (evil-define-key 'normal org-mode-map "<TAB>" 'org-cycle)
   )
 
 ;; Hydra for interactive pop up menus
@@ -425,6 +420,33 @@
   :ensure t
   )
 
+(use-package company
+  :ensure t
+  :config
+  (add-hook 'after-init-hook 'global-company-mode))
+
+;; To use this package I also had to install ccls in my system
+;; 
+;; git clone https://github.com/MaskRay/ccls --depth=1
+;; cd ccls
+;; git submodule update --init
+;; cmake -H. -BRelease
+;; cmake --build Release
+;;
+;; or for MacOS:
+;; brew tap twlz0ne/homebrew-ccls
+;; brew install ccls
+(use-package ccls
+  :after (company)
+  :ensure t
+  :when (executable-find "ccls")
+  :init
+  (add-hook 'c-common-hook #'ccls//enable)
+  (add-hook 'c++-common-hook #'ccls//enable)
+  (add-to-list 'company-backends 'company-lsp)
+  :config
+  (setq ccls-executable (executable-find "ccls")))
+
 ;; Next package
 
 ;; ======================================================================
@@ -434,6 +456,7 @@
 ;; Function to disable all themes, as emacs allows several themes to
 ;; be up at the same time
 (defun pm/disable-all-themes()
+  "Cleans up theme configurations."
   (interactive)
   (mapc #'disable-theme custom-enabled-themes))
 
@@ -522,7 +545,7 @@
   )
 
 (use-package gotham
-  :ensure gotham
+  :ensure gotham-theme
   :defer t
   )
 
@@ -615,9 +638,10 @@ _g_: Gotham
  '(nrepl-message-colors
    (quote
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
+ '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (try gotham cyberpunk-theme gotham-theme powerline flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
+    (ccls company-mode org org-mobile-sync try gotham cyberpunk-theme gotham-theme powerline flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#657b83" 0.2))

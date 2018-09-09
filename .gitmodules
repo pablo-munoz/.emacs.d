@@ -1,0 +1,3 @@
+[submodule "third-party/major-mode-hydra.el"]
+	path = third-party/major-mode-hydra.el
+	url = https://github.com/jerrypnz/major-mode-hydra.el
