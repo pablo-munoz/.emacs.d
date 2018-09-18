@@ -49,6 +49,9 @@
 (set-default-coding-systems 'utf-8-unix)
 
 ;; set a default font
+(when (member "Source Code Pro for Powerline" (font-family-list))
+  (set-face-attribute 'default nil :font "Source Code Pro for Powerline" :height 130))
+
 (when (member "DejaVu Sans Mono" (font-family-list))
   (set-face-attribute 'default nil :font "DejaVu Sans Mono" :height 130))
 
@@ -186,6 +189,7 @@
   (define-key evil-normal-state-map (kbd ", w") 'evil-window-vsplit)
   (evil-define-key 'normal org-mode-map "<tab>" 'org-cycle)
   (evil-define-key 'normal org-mode-map "<TAB>" 'org-cycle)
+  (evil-define-key 'normal 'global "gd" 'rtags-find-symbol-at-point)
   )
 
 ;; Hydra for interactive pop up menus
@@ -369,6 +373,7 @@
 
 (use-package ledger-mode
   :ensure t
+  :when (executable-find "ledger")
   :mode ("\\.dat\\'"
 	 "\\.ledger\\'")
   :custom (ledger-clear-whole-transactions t)
@@ -423,7 +428,24 @@
 (use-package company
   :ensure t
   :config
-  (add-hook 'after-init-hook 'global-company-mode))
+  (add-hook 'after-init-hook 'global-company-mode)
+  (setq company-backends (delete 'company-semantic company-backends))
+  (define-key c-mode-map  [(tab)] 'company-complete)
+  (define-key c++-mode-map  [(tab)] 'company-complete))
+
+(use-package smartparens
+  :ensure t
+  :config 
+  (show-smartparens-global-mode +1)
+  (smartparens-global-mode 1)
+
+  ;; when you press RET, the curly braces automatically
+  ;; add another newline
+  (sp-with-modes '(c-mode c++-mode)
+		 (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
+		 (sp-local-pair "/*" "*/" :post-handlers '((" | " "SPC")
+							   ("* ||\n[i]" "RET"))))
+  )
 
 ;; To use this package I also had to install ccls in my system
 ;; 
@@ -436,16 +458,41 @@
 ;; or for MacOS:
 ;; brew tap twlz0ne/homebrew-ccls
 ;; brew install ccls
-(use-package ccls
-  :after (company)
+
+;; (use-package rtags
+;;   :ensure t
+;;   :load-path "~/.emacs.d/third-party/rtags"
+;;   :custom
+;;   (rtags-path "~/.emacs.d/third-party/rtags/bin")
+;;   )
+
+;; (use-package cmake-ide
+;;   :ensure t
+;;   :requires (rtags)
+;;   :config
+;;   (cmake-ide-setup)
+;;   )
+
+(use-package ggtags
   :ensure t
-  :when (executable-find "ccls")
-  :init
-  (add-hook 'c-common-hook #'ccls//enable)
-  (add-hook 'c++-common-hook #'ccls//enable)
-  (add-to-list 'company-backends 'company-lsp)
   :config
-  (setq ccls-executable (executable-find "ccls")))
+  (add-hook 'c-mode-common-hook
+	    (lambda ()
+	      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+		(ggtags-mode 1))))
+
+  (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
+  (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
+  (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
+  (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
+  (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
+  (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
+
+  (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
+  )
+
+(use-package sr-speedbar
+  :ensure t)
 
 ;; Next package
 
@@ -641,9 +688,10 @@ _g_: Gotham
  '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (ccls company-mode org org-mobile-sync try gotham cyberpunk-theme gotham-theme powerline flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
+    (smartparens sr-speedbar ggtags cmake-ide ccls company-mode org org-mobile-sync try gotham cyberpunk-theme gotham-theme powerline flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
+ '(rtags-path "~/.emacs.d/third-party/rtags/bin")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#657b83" 0.2))
  '(term-default-bg-color "#fdf6e3")
  '(term-default-fg-color "#657b83")
