@@ -384,7 +384,9 @@
 (use-package pyenv-mode
   :ensure t
   :config
-  (setenv "WORKON_HOME" "~/my/virtualenvs")
+  (setenv "WORKON_HOME" "~/virtualenvs")
+  (setq python-shell-interpreter "ipython"
+        python-shell-interpreter-args "--simple-prompt -i")
   )
 
 (use-package exec-path-from-shell
@@ -407,11 +409,11 @@
   :config
   )
 
-(use-package powerline
-  :ensure t
-  :config
-  (powerline-default-theme)
-  )
+;; (use-package powerline
+;;   :ensure t
+;;   :config
+;;   (powerline-default-theme)
+;;   )
 
 (use-package dockerfile-mode
   :ensure t
@@ -430,8 +432,7 @@
   :config
   (add-hook 'after-init-hook 'global-company-mode)
   (setq company-backends (delete 'company-semantic company-backends))
-  (define-key c-mode-map  [(tab)] 'company-complete)
-  (define-key c++-mode-map  [(tab)] 'company-complete))
+  )
 
 (use-package smartparens
   :ensure t
@@ -493,6 +494,31 @@
 
 (use-package sr-speedbar
   :ensure t)
+
+(use-package yasnippet
+  :ensure t
+  :config (yas-global-mode)
+  )
+
+(use-package yaml-mode
+  :ensure t
+  )
+
+(use-package minions
+  :ensure t
+  :config (minions-mode 1))
+
+(use-package moody
+  :ensure t
+  :config
+  (setq x-underline-at-descent-line t)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
+
+(use-package pdf-tools
+  :ensure t
+  :config (pdf-tools-install)
+  )
 
 ;; Next package
 
@@ -556,6 +582,11 @@
   :defer t
   )
 
+(use-package srcery-theme
+  :ensure t
+  :defer t
+  )
+
 (use-package cherry-blossom
   :ensure cherry-blossom-theme
   :defer t
@@ -601,6 +632,11 @@
   :defer t
   )
 
+(use-package paganini
+  :ensure paganini-theme
+  :defer t
+  )
+
 (defhydra pm/themes-hydra (:hint nil :color pink)
   "
 Themes
@@ -608,7 +644,7 @@ Themes
 _s_: Sol Dark     _m_: Mat Dark      _x_: Toxi    _DEL_: none
 _S_: Sol Light    _M_: Mat Light     _c_: Cherry
 _f_: Calm For     _b_: Sanity Blue   _k_: Cpunk
-_g_: Gotham
+_g_: Gotham       _s_: Srcery        _p_: Paganini
 "
   ("s" (load-theme 'solarized-dark  t))
   ("S" (load-theme 'solarized-light t))
@@ -619,7 +655,9 @@ _g_: Gotham
   ("f" (load-theme 'calmer-forest   t))
   ("b" (load-theme 'sanityinc-tomorrow-blue))
   ("g" (load-theme 'gotham t))
-  ("k" (load-theme 'cyberpunk-theme t))
+  ("s" (load-theme 'srcery t))
+  ("k" (load-theme 'cyberpunk t))
+  ("p" (load-theme 'paganini t))
   ("DEL" (pm/disable-all-themes))
   ("RET" nil "done" :color blue)
   )
@@ -646,7 +684,7 @@ _g_: Gotham
  '(cua-read-only-cursor-color "#859900")
  '(custom-safe-themes
    (quote
-    ("82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "04589c18c2087cd6f12c01807eed0bdaa63983787025c209b89c779c61c3a4c4" "8a97050c9dd0af1cd8c3290b061f4b6032ccf2044ddc4d3c2c39e516239b2463" default)))
+    ("3860a842e0bf585df9e5785e06d600a86e8b605e5cc0b74320dfe667bcbe816c" "c85a604d78d8f64cd555d11d58dad4ea14d7d97b5005afaa2ec0b73a7538f984" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "04589c18c2087cd6f12c01807eed0bdaa63983787025c209b89c779c61c3a4c4" "8a97050c9dd0af1cd8c3290b061f4b6032ccf2044ddc4d3c2c39e516239b2463" default)))
  '(fci-rule-color "#ECEFF1")
  '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
  '(flycheck-global-modes (quote (not org-mode)))
@@ -688,7 +726,7 @@ _g_: Gotham
  '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (smartparens sr-speedbar ggtags cmake-ide ccls company-mode org org-mobile-sync try gotham cyberpunk-theme gotham-theme powerline flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
+    (pdf-tools yaml-mode paganini-theme srcery-theme smartparens sr-speedbar ggtags cmake-ide ccls company-mode org org-mobile-sync try gotham cyberpunk-theme gotham-theme powerline flycheck exec-path-from-shell pyenv-mode ledger-mode docker-tramp counsel which-key git-timemachine git-gutter magit flymake-cursor elpy org-jira major-mode-hydra color-theme-sanityinc-tomorrow calmer-forest-theme cherry-blossom-theme toxi-theme solarized-theme material-theme hydra org-bullets use-package evil)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(rtags-path "~/.emacs.d/third-party/rtags/bin")
